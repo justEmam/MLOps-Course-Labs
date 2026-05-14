@@ -1,0 +1,16 @@
+artifact_uri: mlflow-artifacts:/0/5485f5e6f1e34820b32a7ac803a6f594/artifacts
+deleted_time: 1769874562169
+end_time: 1769868160832
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: deleted
+run_id: 5485f5e6f1e34820b32a7ac803a6f594
+run_name: abrasive-skink-169
+run_uuid: 5485f5e6f1e34820b32a7ac803a6f594
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1769868160622
+status: 4
+tags: []
+user_id: User

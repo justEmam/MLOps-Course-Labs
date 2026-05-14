@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/MLOps-Course-Labs/mlruns/290166923525764022/1305ccc773674bd4a156885a5ae62336/artifacts
+end_time: 1769874386538
+entry_point_name: ''
+experiment_id: '290166923525764022'
+lifecycle_stage: active
+run_id: 1305ccc773674bd4a156885a5ae62336
+run_name: svm
+run_uuid: 1305ccc773674bd4a156885a5ae62336
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1769874375483
+status: 3
+tags: []
+user_id: User

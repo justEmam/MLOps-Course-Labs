@@ -1,0 +1,16 @@
+artifact_uri: file:///C:/MLOps-Course-Labs/mlruns/290166923525764022/456b605357664a02820e8e984aa36a5c/artifacts
+deleted_time: 1769872270406
+end_time: 1769872216769
+entry_point_name: ''
+experiment_id: '290166923525764022'
+lifecycle_stage: deleted
+run_id: 456b605357664a02820e8e984aa36a5c
+run_name: vaunted-duck-911
+run_uuid: 456b605357664a02820e8e984aa36a5c
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1769872196250
+status: 3
+tags: []
+user_id: User

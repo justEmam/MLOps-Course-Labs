@@ -1,0 +1,14 @@
+aliases: []
+creation_timestamp: 1769874586941
+current_stage: None
+description: ''
+last_updated_timestamp: 1769874586941
+name: ChurnClassifier
+run_id: 1305ccc773674bd4a156885a5ae62336
+run_link: ''
+source: file:///C:/MLOps-Course-Labs/mlruns/290166923525764022/1305ccc773674bd4a156885a5ae62336/artifacts/svm_model
+status: READY
+status_message: null
+storage_location: file:///C:/MLOps-Course-Labs/mlruns/290166923525764022/1305ccc773674bd4a156885a5ae62336/artifacts/svm_model
+user_id: null
+version: 2

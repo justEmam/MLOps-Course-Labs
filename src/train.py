@@ -2,7 +2,11 @@
 This module contains functions to preprocess and train the model
 for bank consumer churn prediction.
 """
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.svm import SVC
 
+from mlflow.models import infer_signature
+import mlflow
 import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.utils import resample
@@ -20,6 +24,8 @@ from sklearn.metrics import (
 )
 
 ### Import MLflow
+
+
 
 def rebalance(data):
     """
@@ -108,6 +114,12 @@ def preprocess(df):
 
     # Log the transformer as an artifact
 
+    mlflow.sklearn.log_model(
+        sk_model=col_transf,
+        artifact_path="preprocessor"
+    )
+
+
     return col_transf, X_train, X_test, y_train, y_test
 
 
@@ -124,51 +136,174 @@ def train(X_train, y_train):
     """
     log_reg = LogisticRegression(max_iter=1000)
     log_reg.fit(X_train, y_train)
+    signature = infer_signature(X_train,log_reg.predict(X_train))
+    input_example = X_train.iloc[:1]
 
-    ### Log the model with the input and output schema
-    # Infer signature (input and output schema)
-
-    # Log model
-
-    ### Log the data
+    mlflow.sklearn.log_model(
+            log_reg,
+            artifact_path="logistic_regression_model",
+            signature=signature,
+            input_example=input_example
+        )
+    X_train.to_csv("X_train.csv", index=False)
+    mlflow.log_artifact("X_train.csv", artifact_path="train_data")
+    pd_dataset = mlflow.data.from_pandas(X_train, name="Training Dataset")
+    mlflow.log_input(pd_dataset, context="Training")
 
     return log_reg
+
+def train2(X_train, y_train):
+    """
+    Train a random forest model.
+
+    Args:
+        X_train (pd.DataFrame): DataFrame with features
+        y_train (pd.Series): Series with target
+
+    Returns:
+        RandomForestClassifier: trained random forest model
+    """
+    # Instantiate the Random Forest
+    rf_model = RandomForestClassifier(n_estimators=100, random_state=42)
+    rf_model.fit(X_train, y_train)
+
+    # Infer signature and input example
+    signature = infer_signature(X_train, rf_model.predict(X_train))
+    input_example = X_train.iloc[:1]
+
+    # Log model to MLflow
+    mlflow.sklearn.log_model(
+        sk_model=rf_model,
+        artifact_path="random_forest_model",
+        signature=signature,
+        input_example=input_example
+    )
+
+    # Log training data as artifact
+    X_train.to_csv("X_train.csv", index=False)
+    mlflow.log_artifact("X_train.csv", artifact_path="train_data")
+    pd_dataset = mlflow.data.from_pandas(X_train, name="Training Dataset")
+    mlflow.log_input(pd_dataset, context="Training")
+
+
+    return rf_model
+
+def train3(X_train, y_train):
+    """
+    Train an SVM model.
+
+    Args:
+        X_train (pd.DataFrame): DataFrame with features
+        y_train (pd.Series): Series with target
+
+    Returns:
+        SVC: trained SVM model
+    """
+    svm_model = SVC(kernel="rbf", probability=True, random_state=42)
+    svm_model.fit(X_train, y_train)
+
+    signature = infer_signature(X_train, svm_model.predict(X_train))
+    input_example = X_train.iloc[:1]
+
+    mlflow.sklearn.log_model(
+        sk_model=svm_model,
+        artifact_path="svm_model",
+        signature=signature,
+        input_example=input_example
+    )
+
+    X_train.to_csv("X_train.csv", index=False)
+    mlflow.log_artifact("X_train.csv", artifact_path="train_data")
+    pd_dataset = mlflow.data.from_pandas(X_train, name="Training Dataset")
+    mlflow.log_input(pd_dataset, context="Training")
+
+
+    return svm_model
 
 
 def main():
     ### Set the tracking URI for MLflow
+    mlflow.set_tracking_uri("file:./mlruns")
+
 
     ### Set the experiment name
-
+    experiment_name = "churn_prediction"
+    mlflow.set_experiment(experiment_name)
 
     ### Start a new run and leave all the main function code as part of the experiment
+    with mlflow.start_run(run_name="logistic_reg"):
 
-    df = pd.read_csv("data/Churn_Modelling.csv")
-    col_transf, X_train, X_test, y_train, y_test = preprocess(df)
+        df = pd.read_csv("dataset/Churn_Modelling.csv")
+        col_transf, X_train, X_test, y_train, y_test = preprocess(df)
 
-    ### Log the max_iter parameter
+        ### Log the max_iter parameter
 
-    model = train(X_train, y_train)
+        model = train(X_train, y_train)
+        mlflow.log_param("max_iter", model.get_params()["max_iter"])
 
-    
-    y_pred = model.predict(X_test)
+        
+        y_pred = model.predict(X_test)
 
-    ### Log metrics after calculating them
+        ### Log metrics after calculating them
+        mlflow.log_metrics({
+            "accuracy": accuracy_score(y_test, y_pred),
+            "f1": f1_score(y_test, y_pred),
+            "precision": precision_score(y_test,y_pred),
+            "recall": recall_score(y_test,y_pred)
+        })
+
+        ### Log tag
+        mlflow.set_tag("problem_type", "binary_classification_lr")
+
+        
+        conf_mat = confusion_matrix(y_test, y_pred, labels=model.classes_)
+        conf_mat_disp = ConfusionMatrixDisplay(
+            confusion_matrix=conf_mat, display_labels=model.classes_
+        )
+        conf_mat_disp.plot()
+
+        plt.savefig("confusion_matrix.png")
+        mlflow.log_artifact("confusion_matrix.png")
+        
+        # Log the image as an artifact in MLflow
+
+    with mlflow.start_run(run_name="random_forest"):
+        model = train2(X_train, y_train)
+        y_pred = model.predict(X_test)
+        mlflow.log_metrics({
+            "accuracy": accuracy_score(y_test, y_pred),
+            "f1": f1_score(y_test, y_pred),
+            "precision": precision_score(y_test, y_pred),
+            "recall": recall_score(y_test, y_pred)
+        })
+        mlflow.set_tag("problem_type", "binary_classification_rf")
+
+        conf_mat = confusion_matrix(y_test, y_pred, labels=model.classes_)
+        ConfusionMatrixDisplay(confusion_matrix=conf_mat, display_labels=model.classes_).plot()
+        plt.savefig("confusion_matrix_rf.png")
+        mlflow.log_artifact("confusion_matrix_rf.png")
+        plt.close()
+
+    # SVM Run
+    with mlflow.start_run(run_name="svm"):
+        model = train3(X_train, y_train)
+        y_pred = model.predict(X_test)
+        mlflow.log_metrics({
+            "accuracy": accuracy_score(y_test, y_pred),
+            "f1": f1_score(y_test, y_pred),
+            "precision": precision_score(y_test, y_pred),
+            "recall": recall_score(y_test, y_pred)
+        })
+        mlflow.set_tag("problem_type", "binary_classification_svm")
+
+        conf_mat = confusion_matrix(y_test, y_pred, labels=model.classes_)
+        ConfusionMatrixDisplay(confusion_matrix=conf_mat, display_labels=model.classes_).plot()
+        plt.savefig("confusion_matrix_svm.png")
+        mlflow.log_artifact("confusion_matrix_svm.png")
+        plt.close()
+        
 
 
-    ### Log tag
-
-
-    
-    conf_mat = confusion_matrix(y_test, y_pred, labels=model.classes_)
-    conf_mat_disp = ConfusionMatrixDisplay(
-        confusion_matrix=conf_mat, display_labels=model.classes_
-    )
-    conf_mat_disp.plot()
-    
-    # Log the image as an artifact in MLflow
-    
-    plt.show()
 
 
 if __name__ == "__main__":

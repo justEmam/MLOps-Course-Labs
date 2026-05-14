@@ -1,0 +1,16 @@
+artifact_uri: mlflow-artifacts:/0/a4076bc274224da985e1d0a991c1b475/artifacts
+deleted_time: 1769874562168
+end_time: 1769868712572
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: deleted
+run_id: a4076bc274224da985e1d0a991c1b475
+run_name: adorable-pig-780
+run_uuid: a4076bc274224da985e1d0a991c1b475
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1769868712453
+status: 4
+tags: []
+user_id: User

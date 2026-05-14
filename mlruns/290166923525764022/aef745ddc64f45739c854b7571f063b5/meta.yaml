@@ -1,0 +1,16 @@
+artifact_uri: file:///C:/MLOps-Course-Labs/mlruns/290166923525764022/aef745ddc64f45739c854b7571f063b5/artifacts
+deleted_time: 1769874437946
+end_time: 1769874069630
+entry_point_name: ''
+experiment_id: '290166923525764022'
+lifecycle_stage: deleted
+run_id: aef745ddc64f45739c854b7571f063b5
+run_name: logistic_reg
+run_uuid: aef745ddc64f45739c854b7571f063b5
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1769874053394
+status: 4
+tags: []
+user_id: User

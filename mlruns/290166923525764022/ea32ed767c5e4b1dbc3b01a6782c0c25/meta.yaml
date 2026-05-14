@@ -1,0 +1,16 @@
+artifact_uri: file:///C:/MLOps-Course-Labs/mlruns/290166923525764022/ea32ed767c5e4b1dbc3b01a6782c0c25/artifacts
+deleted_time: 1769872270406
+end_time: 1769871016651
+entry_point_name: ''
+experiment_id: '290166923525764022'
+lifecycle_stage: deleted
+run_id: ea32ed767c5e4b1dbc3b01a6782c0c25
+run_name: grandiose-horse-766
+run_uuid: ea32ed767c5e4b1dbc3b01a6782c0c25
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1769870951240
+status: 3
+tags: []
+user_id: User

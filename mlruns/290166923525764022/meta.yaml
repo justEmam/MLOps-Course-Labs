@@ -1,0 +1,6 @@
+artifact_location: file:///C:/MLOps-Course-Labs/mlruns/290166923525764022
+creation_time: 1769869746083
+experiment_id: '290166923525764022'
+last_update_time: 1769869746083
+lifecycle_stage: active
+name: churn_prediction

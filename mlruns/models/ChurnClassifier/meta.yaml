@@ -1,0 +1,7 @@
+aliases:
+  production: '2'
+  staging: '1'
+creation_timestamp: 1769874575478
+description: ''
+last_updated_timestamp: 1769874839308
+name: ChurnClassifier
