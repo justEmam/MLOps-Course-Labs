@@ -82,4 +82,4 @@ jobs:
             docker pull "$IMAGE"
             docker stop churn-api || true
             docker rm churn-api || true
-            docker run -d --name churn-api -p 8000:8000 --env-file /home/${{ secrets.EC2_USER }}/.env -v /home/${{ secrets.EC2_USER }}/mlruns:/app/mlruns "$IMAGE"
+            docker run -d --name churn-api -p 443:8000 --env-file /home/${{ secrets.EC2_USER }}/.env -v /home/${{ secrets.EC2_USER }}/mlruns:/app/mlruns "$IMAGE"
