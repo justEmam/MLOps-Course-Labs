@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [ main, master, research ]
 
+env:
+  # Opt into Node.js 24 for JavaScript-based actions to avoid deprecation warnings
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -92,13 +96,19 @@ jobs:
   deploy:
     needs: build_and_push
     runs-on: ubuntu-latest
+    # Only run deploy when EC2_HOST is provided via secrets (so CI/build can pass without deploy)
+    if: ${{ secrets.EC2_HOST != '' }}
+    env:
+      EC2_HOST: ${{ secrets.EC2_HOST }}
+      EC2_USER: ${{ secrets.EC2_USER }}
+      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
     steps:
       - name: Deploy to EC2 via SSH
         uses: appleboy/ssh-action@v0.1.7
         with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          host: ${{ env.EC2_HOST }}
+          username: ${{ env.EC2_USER }}
+          key: ${{ env.SSH_PRIVATE_KEY }}
           script: |
             set -e
             IMAGE=${{ needs.build_and_push.outputs.image }}
