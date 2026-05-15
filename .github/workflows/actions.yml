@@ -1,15 +1,14 @@
 name: CI/CD
-
+ 
 on:
   push:
     branches: [ main, master, research ]
   pull_request:
     branches: [ main, master, research ]
-
+ 
 env:
-  # Opt into Node.js 24 for JavaScript-based actions to avoid deprecation warnings
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
+ 
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -26,7 +25,7 @@ jobs:
       - name: Run tests
         run: |
           python -m pytest -q --maxfail=1 --disable-warnings
-
+ 
   build_and_push:
     needs: test
     runs-on: ubuntu-latest
@@ -46,23 +45,21 @@ jobs:
         uses: docker/setup-qemu-action@v2
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
-
-      # Docker Hub login and push (if DOCKERHUB credentials provided)
+ 
       - name: Login to Docker Hub
         if: ${{ env.DOCKERHUB_USERNAME != '' }}
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-
+ 
       - name: Build and push to Docker Hub
         if: ${{ env.DOCKERHUB_USERNAME != '' }}
         uses: docker/build-push-action@v4
         with:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/churn-api:latest
-
-      # AWS ECR login and push (if AWS credentials provided)
+ 
       - name: Configure AWS credentials for ECR
         if: ${{ env.AWS_ACCOUNT_ID != '' && env.AWS_REGION != '' && env.ECR_REPOSITORY != '' }}
         uses: aws-actions/configure-aws-credentials@v2
@@ -70,21 +67,21 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
-
+ 
       - name: Login to Amazon ECR
         if: ${{ env.AWS_ACCOUNT_ID != '' && env.AWS_REGION != '' && env.ECR_REPOSITORY != '' }}
         uses: aws-actions/amazon-ecr-login@v1
-
+ 
       - name: Build and push to ECR
         if: ${{ env.AWS_ACCOUNT_ID != '' && env.AWS_REGION != '' && env.ECR_REPOSITORY != '' }}
         uses: docker/build-push-action@v4
         with:
           push: true
           tags: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}:latest
+ 
       - name: Set image output
         id: set-image
         run: |
-          # Determine which registry/image was pushed and set the job output accordingly.
           if [ "${DOCKERHUB_USERNAME}" != "" ]; then
             echo "image=${DOCKERHUB_USERNAME}/churn-api:latest" >> $GITHUB_OUTPUT
           elif [ "${AWS_ACCOUNT_ID}" != "" ] && [ "${AWS_REGION}" != "" ] && [ "${ECR_REPOSITORY}" != "" ]; then
@@ -92,13 +89,12 @@ jobs:
           else
             echo "image=churn-api:latest" >> $GITHUB_OUTPUT
           fi
-
+ 
   deploy:
     needs: build_and_push
     runs-on: ubuntu-latest
     steps:
       - name: Deploy to EC2 via SSH
-        if: ${{ secrets.EC2_HOST != '' }}
         uses: appleboy/ssh-action@v0.1.7
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -106,7 +102,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             set -e
-            IMAGE=${{ needs.build_and_push.outputs.image }}
+            IMAGE="${{ needs.build_and_push.outputs.image }}"
             echo "Pulling image: $IMAGE"
             docker pull "$IMAGE"
             docker stop churn-api || true
