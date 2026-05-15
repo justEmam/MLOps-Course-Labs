@@ -2,7 +2,9 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
-
+# Avoid Python writing .pyc files and enable unbuffered logging
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
 # Install build deps then app deps
 COPY requirements-app.txt /app/requirements-app.txt
