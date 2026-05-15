@@ -77,7 +77,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             set -e
-            IMAGE="${{ needs.build_and_push.outputs.image }}"
+            IMAGE="${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}:latest"
             echo "Pulling image: $IMAGE"
             docker pull "$IMAGE"
             docker stop churn-api || true
