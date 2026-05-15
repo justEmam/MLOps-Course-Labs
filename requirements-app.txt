@@ -6,6 +6,5 @@ pytest-cov>=4.0.0
 pandas
 scikit-learn
 joblib
-# Optional: hyperdx
 python-dotenv
 httpx
