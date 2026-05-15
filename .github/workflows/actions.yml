@@ -96,19 +96,14 @@ jobs:
   deploy:
     needs: build_and_push
     runs-on: ubuntu-latest
-    # Only run deploy when EC2_HOST is provided via secrets (so CI/build can pass without deploy)
-    if: ${{ env.EC2_HOST != '' }}
-    env:
-      EC2_HOST: ${{ secrets.EC2_HOST }}
-      EC2_USER: ${{ secrets.EC2_USER }}
-      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
     steps:
       - name: Deploy to EC2 via SSH
+        if: ${{ secrets.EC2_HOST != '' }}
         uses: appleboy/ssh-action@v0.1.7
         with:
-          host: ${{ env.EC2_HOST }}
-          username: ${{ env.EC2_USER }}
-          key: ${{ env.SSH_PRIVATE_KEY }}
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             set -e
             IMAGE=${{ needs.build_and_push.outputs.image }}
@@ -116,4 +111,4 @@ jobs:
             docker pull "$IMAGE"
             docker stop churn-api || true
             docker rm churn-api || true
-            docker run -d --name churn-api -p 8000:8000 --env-file /home/${{ env.EC2_USER }}/.env -v /home/${{ env.EC2_USER }}/mlruns:/app/mlruns "$IMAGE"
+            docker run -d --name churn-api -p 8000:8000 --env-file /home/${{ secrets.EC2_USER }}/.env -v /home/${{ secrets.EC2_USER }}/mlruns:/app/mlruns "$IMAGE"
